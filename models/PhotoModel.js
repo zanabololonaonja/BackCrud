@@ -1,5 +1,6 @@
 const pool = require('../config/db');
 
+// AJOUT
 const createPhoto = async (idphoto, idalbum, namephoto, attachedfile) => {
     try {
         const result = await pool.query(
@@ -13,6 +14,7 @@ const createPhoto = async (idphoto, idalbum, namephoto, attachedfile) => {
     }
 };
 
+// AFFICHE
 const getPhoto = async () => {
     try {
         const result = await pool.query('SELECT * FROM photo');
@@ -23,7 +25,7 @@ const getPhoto = async () => {
     }
 };
 
-// Fonction pour supprimer une photo par idphoto
+// supprimer
 const removePhoto = async (idphoto) => {
     try {
         const result = await pool.query('DELETE FROM photo WHERE idphoto = $1', [idphoto]);
@@ -34,7 +36,7 @@ const removePhoto = async (idphoto) => {
     }
 };
 
-
+// MODIFIER
 const updatePhotoById = async (id, idalbum, namephoto, attachedfile) => {
     try {
       const query = `

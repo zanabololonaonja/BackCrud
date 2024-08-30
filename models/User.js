@@ -23,21 +23,26 @@ const getAlbums = async () => {
   }
 };
 
-// const createPhoto = async (idphoto, idalbum, namephoto, attachedfile) => {
-//   try {
-//     const result = await pool.query(
-//       'INSERT INTO photo (idphoto, idalbum, namephoto, attachedfile) VALUES ($1, $2, $3, $4) RETURNING *',
-//       [idphoto, idalbum, namephoto, attachedfile]
-//     );
-//     return result.rows[0];
-//   } catch (err) {
-//     console.error('Erreur dans le modèle createPhoto:', err.message);
-//     throw err;
-//   }
-// };
+
+
+const createUser = async (useremailaddress, userpassword, username, usermiddlename, userlastname) => {
+  try {
+    const result = await pool.query(
+      'INSERT INTO public.users (useremailaddress, userpassword, username, usermiddlename, userlastname) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [useremailaddress, userpassword, username, usermiddlename, userlastname]
+    );
+    return result.rows[0];
+  } catch (err) {
+    console.error('Erreur dans le modèle createUser:', err.message);
+    throw err;
+  }
+};
+
+
 
 module.exports = {
-  createAlbum,
+  createAlbum ,
   getAlbums,
-  // createPhoto,
+  createUser,
+
 };
