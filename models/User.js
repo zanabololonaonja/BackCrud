@@ -38,11 +38,24 @@ const createUser = async (useremailaddress, userpassword, username, usermiddlena
   }
 };
 
+// Nouvelle fonction pour trouver un utilisateur par email
+const findUserByEmail = async (email) => {
+  try {
+    const result = await pool.query('SELECT * FROM public.users WHERE useremailaddress = $1', [email]);
+    return result.rows[0];
+  } catch (err) {
+    console.error('Erreur dans le modèle findUserByEmail:', err.message);
+    throw err;
+  }
+};
+
+
 
 
 module.exports = {
   createAlbum ,
   getAlbums,
   createUser,
+  findUserByEmail,
 
 };

@@ -5,7 +5,7 @@ const upload = require('../middleware/multer');
 const { addAlbum, getAllAlbums } = require('../controllers/UserController');
 const { addPhoto, getAllPhoto, deletePhoto, updatePhoto } = require('../controllers/PhotosController');
 
-const { addUser } = require('../controllers/AuthController'); // Importer les contrôleurs pour l'authentification
+const { addUser, loginUser } = require('../controllers/AuthController'); // Importer les contrôleurs pour l'authentification
 const router = express.Router();
 
 
@@ -19,5 +19,6 @@ router.put('/api/photos/:id', upload.single('attachedfile'), updatePhoto);  // m
 
 
 router.post('/api/register', addUser); // ajout user 
+router.post('/api/login', loginUser);
 
 module.exports = router;
