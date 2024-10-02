@@ -57,9 +57,79 @@ const updatePhotoById = async (id, idalbum, namephoto, attachedfile) => {
   };
   
 
+
+  const createEstimation = async (
+    iduser,
+    typefunerailles,
+    lieuceremonie,
+    typeceremonie,
+    lieudeces,
+    transportdistance,
+    typevehicule,
+    typecercueil,
+    typeurne,
+    soins_presentation,
+    fleurs,
+    organisation_ceremonie,
+    lieu_repos,
+    concession_duree,
+    message_personnel
+) => {
+    try {
+        const result = await pool.query(
+            `INSERT INTO recapitulatif (
+                iduser, typefunerailles, lieuceremonie, typeceremonie, lieudeces, 
+                transportdistance, typevehicule, typecercueil, typeurne, 
+                soins_presentation, fleurs, organisation_ceremonie, lieu_repos, 
+                concession_duree, message_personnel
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *`,
+            [
+                iduser,
+                typefunerailles,
+                lieuceremonie,
+                typeceremonie,
+                lieudeces,
+                transportdistance,
+                typevehicule,
+                typecercueil,
+                typeurne,
+                soins_presentation,
+                fleurs,
+                organisation_ceremonie,
+                lieu_repos,
+                concession_duree,
+                message_personnel
+            ]
+        );
+        console.log('Estimation insérée avec succès:', result.rows[0]);
+        return result.rows[0];
+    } catch (err) {
+        console.error('Erreur dans le modèle createEstimation:', err.message);
+        throw err; // Re-throw error for handling in controller
+    }
+};
+
+
+const getEstimationsByUserId = async (iduser) => {
+    try {
+        const result = await pool.query(
+            `SELECT * FROM recapitulatif WHERE iduser = $1`,
+            [iduser]
+        );
+        return result.rows; // Retourne toutes les estimations de cet utilisateur
+    } catch (err) {
+        console.error('Erreur dans le modèle getEstimationsByUserId:', err.message);
+        throw err; // Propagation de l'erreur
+    }
+};
+
+
+
 module.exports = {
     createPhoto,
     getPhoto,
     removePhoto,
-    updatePhotoById
+    updatePhotoById,
+    createEstimation ,
+    getEstimationsByUserId 
 };

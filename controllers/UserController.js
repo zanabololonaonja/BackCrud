@@ -1,51 +1,36 @@
-const { createAlbum, getAlbums } = require('../models/User');
+// controllers/UserController.js
+const { createAlbum, getAlbumsByUser } = require('../models/User'); // Assurez-vous que le chemin est correct
 
+// Ajouter un nouvel album
 const addAlbum = async (req, res) => {
-  const { idalbum, namealbum } = req.body;
-  console.log('Données reçues:', { idalbum, namealbum });
+  const albumData = {
+    namealbum: req.body.namealbum,
+    iduser: req.body.iduser || req.user.id, // Si iduser est passé dans la requête ou via le token/session
+  };
 
   try {
-    const newAlbum = await createAlbum(idalbum, namealbum);
-    console.log('Nouvel album ajouté:', newAlbum);
+    const newAlbum = await createAlbum(albumData);
     res.status(201).json(newAlbum);
-  } catch (err) {
-    console.error('Erreur lors de l’ajout de l’album:', err.message);
-    res.status(500).json({ message: 'Erreur serveur', details: err.message });
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur serveur', details: error.message });
   }
 };
 
+
+// Récupérer les albums par utilisateur
 const getAllAlbums = async (req, res) => {
+  const userId = req.query.userId;
+
   try {
-    const albums = await getAlbums();
-    res.json(albums);
-  } catch (err) {
-    console.error('Erreur lors de la récupération des albums:', err.message);
-    res.status(500).json({ message: 'Erreur serveur', details: err.message });
+    const albums = await getAlbumsByUser(userId);
+    res.status(200).json(albums);
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur serveur', details: error.message });
   }
 };
-
-// const addPhoto = async (req, res) => {
-//   const { idphoto, idalbum, namephoto } = req.body;
-//   const attachedfile = req.file; // Accéder au fichier via multer
-
-//   console.log('Données reçues:', { idphoto, idalbum, namephoto, attachedfile });
-
-//   if (!attachedfile) {
-//     return res.status(400).json({ message: 'Aucun fichier téléchargé' });
-//   }
-
-//   try {
-//     const newPhoto = await createPhoto(idphoto, idalbum, namephoto, attachedfile.buffer);
-//     console.log('Nouvelle photo ajoutée:', newPhoto);
-//     res.status(201).json(newPhoto);
-//   } catch (err) {
-//     console.error('Erreur lors de l’ajout de la photo:', err.message);
-//     res.status(500).json({ message: 'Erreur serveur', details: err.message });
-//   }
-// };
 
 module.exports = {
   addAlbum,
   getAllAlbums,
-
+  // Ajoutez d'autres exportations si nécessaire
 };

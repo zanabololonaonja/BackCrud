@@ -1,24 +1,38 @@
-
-
 const express = require('express');
-const upload = require('../middleware/multer');
+const upload = require('../middleware/multer'); // Importer le middleware multer
 const { addAlbum, getAllAlbums } = require('../controllers/UserController');
-const { addPhoto, getAllPhoto, deletePhoto, updatePhoto } = require('../controllers/PhotosController');
+const { addPhoto, getAllPhoto, deletePhoto, updatePhoto,  addEstimation,getEstimations } = require('../controllers/PhotosController');
+const { addUser, loginUser, fetchAllUsers, updateUser, getUserById } = require('../controllers/AuthController'); // Importer les contrôleurs pour l'authentification
 
-const { addUser, loginUser } = require('../controllers/AuthController'); // Importer les contrôleurs pour l'authentification
+
+
 const router = express.Router();
 
+// Routes pour albums
+router.post('/api/albums', addAlbum); // Ajout album
+router.get('/api/albums', getAllAlbums); // Affichage des albums
 
-router.post('/api/albums', addAlbum); //ajout album
-router.get('/api/albums', getAllAlbums);
+// Routes pour utilisateurs
+router.get('/users', fetchAllUsers); // Afficher tous les utilisateurs
+router.post('/api/register', addUser); // Ajout utilisateur
+router.post('/api/login', loginUser); // Connexion utilisateur
 
-router.post('/api/photos', upload.single('attachedfile'), addPhoto); //ajout photo
-router.get('/api/photos', getAllPhoto);   //affichage photos
-router.delete('/api/photos/:idphoto', deletePhoto);  //suppression des photos
-router.put('/api/photos/:id', upload.single('attachedfile'), updatePhoto);  // modification photo
+// Nouvelle route pour mettre à jour un utilisateur avec upload de photo
+router.put('/api/update', upload.single('userphoto'), updateUser); // Mettre à jour utilisateur avec photo
+
+// Routes pour photos
+router.post('/api/photos', upload.single('attachedfile'), addPhoto); // Ajout photo
+router.get('/api/photos', getAllPhoto); // Affichage photos
+router.delete('/api/photos/:idphoto', deletePhoto); // Suppression des photos
+router.put('/api/photos/:id', upload.single('attachedfile'), updatePhoto); // Modification photo
 
 
-router.post('/api/register', addUser); // ajout user 
-router.post('/api/login', loginUser);
+// Route pour ajouter une estimation
+router.post('/api/estimation', addEstimation); // Ajout estimation
+router.get('/api/recapitulatif/:iduser', getEstimations);  // Modification ici
+
+
+// Route pour récupérer un utilisateur par ID
+router.get('/getUser/:id', getUserById);
 
 module.exports = router;
