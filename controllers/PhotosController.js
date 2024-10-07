@@ -1,4 +1,4 @@
-const { createPhoto, getPhoto, removePhoto, updatePhotoById,createEstimation,getEstimationsByUserId  } = require('../models/PhotoModel');
+const { createPhoto, getPhoto, removePhoto, updatePhotoById,createEstimation,getEstimationsByUserId,createTestament, getTestamentsByUserId   } = require('../models/PhotoModel');
 
 
 // AJOUT
@@ -154,11 +154,104 @@ const getEstimations = async (req, res) => {
   }
 };
 
-module.exports = {
-    addPhoto,
-    getAllPhoto,
-    deletePhoto,
-    updatePhoto,
-    addEstimation,
-    getEstimations
+
+
+
+
+const addTestament = async (req, res) => {
+  console.log('Données reçues:', req.body);
+
+  
+  const {
+      iduser,
+      nom_testateur,
+      date_naissance_testateur,
+      lieu_naissance_testateur,
+      adresse_testateur,
+      etranger,
+      nom_executant,
+      nom_executant_alternatif,
+      tuteur_nom,
+      tuteur_adresse,
+      temoin1_nom,
+      temoin1_adresse,
+      temoin2_nom,
+      temoin2_adresse,
+      heritages // On récupère directement les heritages ici
+  } = req.body;
+
+  // Vérifiez si les heritages sont présents et définis
+  if (!heritages) {
+      return res.status(400).json({ message: 'Les héritages sont manquants' });
+  }
+
+  // Transformation des données pour les biens
+  const biens = heritages.map(heritage => ({
+      biensL: heritage.bien_legue,
+      valeur: heritage.valeur // Assurez-vous que 'valeur' est présent dans chaque 'heritage'
+  }));
+
+  // Transformation des données pour les bénéficiaires
+  const beneficiaires = heritages.flatMap(heritage => 
+    (heritage.beneficiaires || []).map(benef => ({
+        nom: benef.benef_nom,
+        date_naissance: benef.benef_date_naissance,
+        // adresse: benef.benef_adresse,
+        relation: benef.benef_relation
+    }))
+);
+ 
+
+  try {
+      const nouveauTestament = await createTestament(
+          iduser,
+          nom_testateur,
+          date_naissance_testateur,
+          lieu_naissance_testateur,
+          adresse_testateur,
+          etranger,
+          nom_executant,
+          nom_executant_alternatif,
+          JSON.stringify(biens), // Convertir les biens en JSON
+          JSON.stringify(beneficiaires), // Convertir les bénéficiaires en JSON
+          tuteur_nom,
+          tuteur_adresse,
+          temoin1_nom,
+          temoin1_adresse,
+          temoin2_nom,
+          temoin2_adresse
+      );
+      console.log('Nouveau testament ajouté:', nouveauTestament);
+      res.status(201).json(nouveauTestament);
+  } catch (err) {
+      console.error('Erreur lors de l’ajout du testament:', err.message);
+      res.status(500).json({ message: 'Erreur serveur', details: err.message });
+  }
 };
+
+
+
+
+// Fonction pour récupérer les testaments par utilisateur
+const getTestaments = async (req, res) => {
+  const { iduser } = req.params;
+  try {
+    const testaments = await getTestamentsByUserId(iduser);
+    res.status(200).json(testaments);
+  } catch (err) {
+    console.error('Erreur lors de la récupération des testaments:', err.message);
+    res.status(500).json({ message: 'Erreur serveur', details: err.message });
+  }
+};
+
+module.exports = {
+  addPhoto,
+  getAllPhoto,
+  deletePhoto,
+  updatePhoto,
+  addEstimation,
+  getEstimations,
+  addTestament,
+  getTestaments
+};
+

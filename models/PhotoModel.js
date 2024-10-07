@@ -125,11 +125,97 @@ const getEstimationsByUserId = async (iduser) => {
 
 
 
-module.exports = {
+
+
+const createTestament = async (  
+    iduser,
+    nom_testateur,
+    date_naissance_testateur,
+    lieu_naissance_testateur,
+    adresse_testateur,
+    etranger,
+    nom_executant,
+    nom_executant_alternatif,
+    bien_legue,
+    adresse_bien_legue,
+    biens = [], // Valeur par défaut si biens est null ou undefined
+    beneficiaires = [], // Valeur par défaut si beneficiaires est null ou undefined
+    tuteur_nom,
+    tuteur_adresse,
+    temoin1_nom,
+    temoin1_adresse,
+    temoin2_nom,
+    temoin2_adresse
+) => {
+    try {
+        const result = await pool.query(
+            `INSERT INTO testaments (
+                iduser,
+                nom_testateur,
+                date_naissance_testateur,
+                lieu_naissance_testateur,
+                adresse_testateur,
+                etranger,
+                nom_executant,
+                nom_executant_alternatif,
+                bien_legue,
+                adresse_bien_legue,
+                biens,
+                beneficiaires,
+                tuteur_nom,
+                tuteur_adresse,
+                temoin1_nom,
+                temoin1_adresse,
+                temoin2_nom,   
+                temoin2_adresse 
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) RETURNING *`,
+            [
+                iduser,
+                nom_testateur,
+                date_naissance_testateur,
+                lieu_naissance_testateur,
+                adresse_testateur,
+                etranger,
+                nom_executant,
+                nom_executant_alternatif,
+                bien_legue,
+                adresse_bien_legue,
+                JSON.stringify(biens), // Convertir les biens en JSON
+                JSON.stringify(beneficiaires), // Convertir les bénéficiaires en JSON
+                tuteur_nom,
+                tuteur_adresse,
+                temoin1_nom,
+                temoin1_adresse,
+                temoin2_nom,
+                temoin2_adresse
+            ]
+        );
+        console.log('Testament inséré avec succès:', result.rows[0]);
+        return result.rows[0];
+    } catch (err) {    
+        console.error('Erreur dans le modèle createTestament:', err.message);
+        throw err;
+    }
+};  
+
+
+  const getTestamentsByUserId = async (iduser) => {
+    try {
+      const result = await pool.query(`SELECT * FROM testaments WHERE iduser = $1`, [iduser]);
+      return result.rows;
+    } catch (err) {
+      console.error('Erreur dans le modèle getTestamentsByUserId:', err.message);
+      throw err;
+    }
+  };
+  
+  module.exports = {
     createPhoto,
     getPhoto,
     removePhoto,
     updatePhotoById,
-    createEstimation ,
-    getEstimationsByUserId 
-};
+    createEstimation,
+    getEstimationsByUserId,
+    createTestament,
+    getTestamentsByUserId
+  };
