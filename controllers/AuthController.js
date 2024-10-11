@@ -1,4 +1,4 @@
-const { createUser, findUserByEmail, getAllUsers, updateUserInDatabase ,findUserById  } = require('../models/User');
+const { createUser, findUserByEmail, getAllUsers, updateUserInDatabase, findUserById, createUserWithPhoto } = require('../models/User'); // Importer les fonctions du modèle
 
 const addUser = async (req, res) => {
   const { useremailaddress, userpassword, username, usermiddlename, userlastname, idphone, typeofuser, besttimeforcall } = req.body;
@@ -109,10 +109,34 @@ const getUserById = async (req, res) => {
 };
 
 
+
+// Ajouter un nouvel utilisateur avec photo
+const addUserWithPhoto = async (req, res) => {
+  const { prenom, nom, email, mpass, relation, iduser } = req.body; // Récupérer les données de la requête
+  const photo = req.file ? req.file.buffer : null; // Récupérer le fichier sous forme de buffer
+
+  // Vérifier si une photo a été fournie
+  if (!photo) {
+    return res.status(400).json({ message: 'Aucune photo fournie' });
+  }
+
+  try {
+    // Insérer l'utilisateur avec la photo et iduser dans la base de données
+    const newUser = await createUserWithPhoto(prenom, nom, email, mpass, relation, iduser, photo);
+    res.status(201).json(newUser); // Retourner l'utilisateur ajouté
+  } catch (err) {
+    console.error('Erreur lors de l’ajout de l’utilisateur:', err.message);
+    res.status(500).json({ message: 'Erreur serveur', details: err.message });
+  }
+};
+
+
   module.exports = {
     addUser,
     loginUser,
     fetchAllUsers, 
     updateUser,  
     getUserById,
+    addUserWithPhoto,
+   
   };

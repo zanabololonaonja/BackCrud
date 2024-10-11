@@ -2,11 +2,15 @@ const express = require('express');
 const upload = require('../middleware/multer'); // Importer le middleware multer
 const { addAlbum, getAllAlbums } = require('../controllers/UserController');
 const { addPhoto, getAllPhoto, deletePhoto, updatePhoto,  addEstimation,getEstimations,addTestament, getTestaments  } = require('../controllers/PhotosController');
-const { addUser, loginUser, fetchAllUsers, updateUser, getUserById } = require('../controllers/AuthController'); // Importer les contrôleurs pour l'authentification
+const { addUser, loginUser, fetchAllUsers, updateUser, getUserById,addUserWithPhoto } = require('../controllers/AuthController'); // Importer les contrôleurs pour l'authentification
 const { updateArrangementById } = require('../controllers/ArrangementsController'); // Importer le contrôleur d'arrangements
 
 
 const router = express.Router();
+
+router.post('/api/contact', upload.single('photo'), addUserWithPhoto); // Route pour ajouter un utilisateur
+
+
 
 
 // Route pour mettre à jour les arrangements

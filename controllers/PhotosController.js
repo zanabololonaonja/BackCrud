@@ -156,13 +156,50 @@ const getEstimations = async (req, res) => {
 
 
 
-
-
 const addTestament = async (req, res) => {
   console.log('Données reçues:', req.body);
-
-  
   const {
+    iduser,
+    nom_testateur,
+    date_naissance_testateur,
+    lieu_naissance_testateur,
+    adresse_testateur,
+    etranger,
+    nom_executant,
+    nom_executant_alternatif,
+    gift_type, // Insertion du type de don
+    gift_description, // Insertion de la description du don
+    gift_amount, // Insertion du montant du don
+    gift_recipient, // Insertion du bénéficiaire du don
+    gift_charity_name,
+    tuteur_nom,
+    tuteur_adresse,
+    temoin1_nom,
+    temoin1_adresse,
+    temoin2_nom,
+    temoin2_adresse,
+    heritages
+  } = req.body;
+
+  if (!heritages) {
+    return res.status(400).json({ message: 'Les héritages sont manquants' });
+  }
+
+  const biens = heritages.map(heritage => ({
+    biensL: heritage.bien_legue
+ 
+  }));
+
+  const beneficiaires = heritages.flatMap(heritage =>
+    (heritage.beneficiaires || []).map(benef => ({
+      nom: benef.benef_nom,
+      date_naissance: benef.benef_date_naissance,
+      relation: benef.benef_relation
+    }))
+  );
+
+  try {
+    const nouveauTestament = await createTestament(
       iduser,
       nom_testateur,
       date_naissance_testateur,
@@ -171,64 +208,27 @@ const addTestament = async (req, res) => {
       etranger,
       nom_executant,
       nom_executant_alternatif,
+      JSON.stringify(biens),
+      JSON.stringify(beneficiaires),  
+      gift_type, // Insertion du type de don
+      gift_description, // Insertion de la description du don
+      gift_amount, // Insertion du montant du don
+      gift_recipient, // Insertion du bénéficiaire du don
+      gift_charity_name, // Insertion de la charité (si applicable)
       tuteur_nom,
       tuteur_adresse,
       temoin1_nom,
       temoin1_adresse,
       temoin2_nom,
-      temoin2_adresse,
-      heritages // On récupère directement les heritages ici
-  } = req.body;
-
-  // Vérifiez si les heritages sont présents et définis
-  if (!heritages) {
-      return res.status(400).json({ message: 'Les héritages sont manquants' });
-  }
-
-  // Transformation des données pour les biens
-  const biens = heritages.map(heritage => ({
-      biensL: heritage.bien_legue,
-      valeur: heritage.valeur // Assurez-vous que 'valeur' est présent dans chaque 'heritage'
-  }));
-
-  // Transformation des données pour les bénéficiaires
-  const beneficiaires = heritages.flatMap(heritage => 
-    (heritage.beneficiaires || []).map(benef => ({
-        nom: benef.benef_nom,
-        date_naissance: benef.benef_date_naissance,
-        // adresse: benef.benef_adresse,
-        relation: benef.benef_relation
-    }))
-);
- 
-
-  try {
-      const nouveauTestament = await createTestament(
-          iduser,
-          nom_testateur,
-          date_naissance_testateur,
-          lieu_naissance_testateur,
-          adresse_testateur,
-          etranger,
-          nom_executant,
-          nom_executant_alternatif,
-          JSON.stringify(biens), // Convertir les biens en JSON
-          JSON.stringify(beneficiaires), // Convertir les bénéficiaires en JSON
-          tuteur_nom,
-          tuteur_adresse,
-          temoin1_nom,
-          temoin1_adresse,
-          temoin2_nom,
-          temoin2_adresse
-      );
-      console.log('Nouveau testament ajouté:', nouveauTestament);
-      res.status(201).json(nouveauTestament);
+      temoin2_adresse
+    );
+    console.log('Nouveau testament ajouté:', nouveauTestament);
+    res.status(201).json(nouveauTestament);
   } catch (err) {
-      console.error('Erreur lors de l’ajout du testament:', err.message);
-      res.status(500).json({ message: 'Erreur serveur', details: err.message });
+    console.error('Erreur lors de l’ajout du testament:', err.message);
+    res.status(500).json({ message: 'Erreur serveur', details: err.message });
   }
 };
-
 
 
 
@@ -243,6 +243,8 @@ const getTestaments = async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur', details: err.message });
   }
 };
+
+
 
 module.exports = {
   addPhoto,

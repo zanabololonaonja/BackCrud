@@ -123,8 +123,18 @@ const findUserById = async (id) => {
     console.error('Erreur dans le modèle findUserById:', err.message);
     throw err;
   }
+
+
 };
 
+
+const createUserWithPhoto = async (prenom, nom, email, mpass, relation, iduser, photo) => {
+  const result = await pool.query(
+    'INSERT INTO contacts (prenom, nom, email, mpass, relation, iduser, photo) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+    [prenom, nom, email, mpass, relation, iduser, photo]
+  );
+  return result.rows[0]; // Retourner l'utilisateur créé
+};
 module.exports = {
   createAlbum,
   getAlbumsByUser,
@@ -133,4 +143,5 @@ module.exports = {
   getAllUsers,
   updateUserInDatabase,
   findUserById, // Nom de fonction modifié pour éviter les collisions
+  createUserWithPhoto,
 };
