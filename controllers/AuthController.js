@@ -1,4 +1,4 @@
-const { createUser, findUserByEmail, getAllUsers, updateUserInDatabase, findUserById, createUserWithPhoto } = require('../models/User'); // Importer les fonctions du modèle
+const { createUser, findUserByEmail, getAllUsers, updateUserInDatabase, findUserById, createUserWithPhoto, getContactsByUserId,findContactByEmailAndPin,findOwnerById, } = require('../models/User'); // Importer les fonctions du modèle
 
 const addUser = async (req, res) => {
   const { useremailaddress, userpassword, username, usermiddlename, userlastname, idphone, typeofuser, besttimeforcall } = req.body;
@@ -131,12 +131,61 @@ const addUserWithPhoto = async (req, res) => {
 };
 
 
-  module.exports = {
-    addUser,
-    loginUser,
-    fetchAllUsers, 
-    updateUser,  
-    getUserById,
-    addUserWithPhoto,
-   
-  };
+
+const fetchContactsByUser = async (req, res) => {
+  const { iduser } = req.params; // Récupère l'iduser depuis les paramètres de la requête
+  try {
+    const contacts = await getContactsByUserId(iduser); // Appel à la fonction du modèle
+    res.status(200).json(contacts); // Retourne les contacts associés à cet iduser
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur', details: err.message });
+  }
+};
+
+// Fonction pour authentifier un contact d'urgence et récupérer les informations du propriétaire
+const authenticateContact = async (req, res) => {
+  const { email, nom } = req.body;
+
+  try {
+    // Rechercher le contact d'urgence par email et nom
+    const contact = await findContactByEmailAndPin(email, nom);
+
+    if (!contact) {
+      return res.status(404).json({ message: 'Contact non trouvé ou mauvais PIN' });
+    }
+
+    // Rechercher les informations du propriétaire associé au contact
+    const owner = await findOwnerById(contact.iduser);
+
+    if (!owner) {
+      return res.status(404).json({ message: 'Propriétaire non trouvé' });
+    }
+
+    // Renvoyer les informations du contact et du propriétaire
+    res.status(200).json({
+      message: 'Connexion réussie!',
+      contact,
+      owner: {
+        iduser: owner.id,
+        username: owner.username,
+        useremail: owner.email,
+        userlastname: owner.lastname,
+      }
+    });
+  } catch (err) {
+    console.error('Erreur lors de l\'authentification du contact:', err.message);
+    res.status(500).json({ message: 'Erreur serveur', details: err.message });
+  }
+};
+
+// Exporter les fonctions nécessaires
+module.exports = {
+  addUser,
+  loginUser,
+  fetchAllUsers, 
+  updateUser,  
+  getUserById,
+  addUserWithPhoto,
+  fetchContactsByUser,
+  authenticateContact,
+};

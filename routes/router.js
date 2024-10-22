@@ -2,13 +2,15 @@ const express = require('express');
 const upload = require('../middleware/multer'); // Importer le middleware multer
 const { addAlbum, getAllAlbums } = require('../controllers/UserController');
 const { addPhoto, getAllPhoto, deletePhoto, updatePhoto,  addEstimation,getEstimations,addTestament, getTestaments  } = require('../controllers/PhotosController');
-const { addUser, loginUser, fetchAllUsers, updateUser, getUserById,addUserWithPhoto } = require('../controllers/AuthController'); // Importer les contrôleurs pour l'authentification
+const { addUser, loginUser, fetchAllUsers, updateUser, getUserById,addUserWithPhoto, fetchContactsByUser, authenticateContact } = require('../controllers/AuthController'); // Importer les contrôleurs pour l'authentification
 const { updateArrangementById } = require('../controllers/ArrangementsController'); // Importer le contrôleur d'arrangements
 
 
 const router = express.Router();
 
 router.post('/api/contact', upload.single('photo'), addUserWithPhoto); // Route pour ajouter un utilisateur
+// Route pour récupérer les contacts par ID utilisateur
+router.get('/api/contacts/:iduser', fetchContactsByUser);
 
 
 
@@ -31,6 +33,9 @@ router.get('/api/albums', getAllAlbums); // Affichage des albums
 router.get('/users', fetchAllUsers); // Afficher tous les utilisateurs
 router.post('/api/register', addUser); // Ajout utilisateur
 router.post('/api/login', loginUser); // Connexion utilisateur
+
+// Route pour authentifier un contact d'urgence
+router.post('/api/auth', authenticateContact);
 
 // Nouvelle route pour mettre à jour un utilisateur avec upload de photo
 router.put('/api/update', upload.single('userphoto'), updateUser); // Mettre à jour utilisateur avec photo

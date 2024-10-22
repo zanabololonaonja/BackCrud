@@ -135,6 +135,52 @@ const createUserWithPhoto = async (prenom, nom, email, mpass, relation, iduser, 
   );
   return result.rows[0]; // Retourner l'utilisateur créé
 };
+
+
+
+
+const getContactsByUserId = async (iduser) => {
+  try {
+    const result = await pool.query('SELECT * FROM contacts WHERE iduser = $1', [iduser]);
+    return result.rows; // Retourne les contacts trouvés
+  } catch (err) {
+    console.error('Erreur dans le modèle getContactsByUserId:', err.message);
+    throw err;
+  }
+};
+
+
+
+
+// Fonction pour trouver un propriétaire par son ID (iduser)
+const findOwnerById = async (iduser) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM users WHERE iduser = $1',  // Remplacez 'id' par 'iduser'
+      [iduser]
+    );
+    return result.rows[0];
+  } catch (err) {
+    console.error('Erreur dans le modèle findOwnerById:', err.message);
+    throw err;
+  }
+};
+
+/// Fonction pour trouver un contact par email et nom
+const findContactByEmailAndPin = async (email, nom) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM contacts WHERE email = $1 AND nom = $2',
+      [email, nom]
+    );
+    return result.rows[0];
+  } catch (err) {
+    console.error('Erreur dans le modèle findContactByEmailAndPin:', err.message);
+    throw err;
+  }
+};
+
+
 module.exports = {
   createAlbum,
   getAlbumsByUser,
@@ -144,4 +190,7 @@ module.exports = {
   updateUserInDatabase,
   findUserById, // Nom de fonction modifié pour éviter les collisions
   createUserWithPhoto,
+  getContactsByUserId,
+  findContactByEmailAndPin,
+  findOwnerById,
 };
